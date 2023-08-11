@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/lineawesome/css/line-awesome.min.css">
+    <link rel="stylesheet" href="../static/fontawesome-free/css/all.min.css">
+    <style>
+        .container-fluid{
+            height: 100vh;
+        }
+        .brand, h3{
+            text-align: center;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        }
+        .box{
+            border: 2px solid #000;
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+        }
+        .box-child{
+            border: 1px solid #000;
+            width: 100%;
+            padding: 10px;
+        }
+        h4{
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="brand">
+            <h3>Inventory Management System Invoice</h3>
+        </div>
+        <div class="box">
+            <div class="box-child">
+                <h4>NAME:</h4>
+                <h4>PHONE NUMBER:</h4>
+                <h4>ADDRESS:</h4>
+                <h4>PRODUCT/PRODUCTS:</h4>
+                <h4>TOTAL QUANTITY:</h4>
+                <h4>TOTAL AMOUNT:</h4>
+                <h4>DATE:</h4>
+                <h4>ID:</h4>
+            </div>
+            <div class="box-child">
+                <h4>{{invs.client_name}}</h4>
+                <h4>{{invs.client_phone}}</h4>
+                <h4>{{invs.client_address}}</h4>
+                <h4>{{invs.products}}</h4>
+                <h4>{{invs.total_qtn}}</h4>
+                <h4 class="text-dark"><i class="fa-solid fa-naira-sign"></i> {{invs.total_price}}</h4>
+                <h4>{{invs.date}}</h4>
+                <h4>RN{{invs.id}}</h4>
+            </div>
+        </div>
+        <h3 class="text-center">Thank You for Choosen Us</h3>
+        <div>
+            <button onclick="clk()" class="btn btn-primary"><i class="la la-print"></i></button>
+        </div>
+    </div>
+
+    <script>
+        function clk(){
+            document.querySelector('.btn').style = 'display:none;';
+            print()
+            document.querySelector('.btn').style = 'display:block;';
+        }
+    </script>
+</body>
+</html>

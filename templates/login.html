@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/lineawesome/css/line-awesome.min.css">
+    <style>
+        .header-section{
+            position: fixed;
+            background-color: #252525;
+            gap: 30px;
+            padding: 20px;
+            width: 100%;
+            z-index: 1000;
+        }
+        a{
+            text-decoration: none;
+            color: yellow;
+            font-size: 20px;
+        }
+        a:hover{
+            color: #fff;
+        }
+        .tabs{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .title{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        .title h2{
+            font-size: 40px;
+            color: yellow;
+        }
+        body{
+            background-color: gainsboro;
+        }
+        i{
+            font-size: 50px;
+        }
+        .la-lock{
+            border: 2px solid #252525;
+            margin-bottom: 10px;
+            padding: 20px;
+            background-color: yellow;
+            border-radius: 50%;
+        }
+        .body-section{
+            margin-top: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        form{
+            width: 50%;
+            padding: 100px;
+            background-color: #252525;
+        }
+        .row{
+            margin-bottom: 10px;
+        }
+        input{
+            text-align: center;
+        }
+        .body-section{
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="header-section">
+            <div class="title text-center">
+                <i class="la la-industry text-warning"></i>
+                <h2>Inventory Management System</h2>
+            </div>
+        </div>
+    </div>
+    <div class="body-section">
+        <i class="la la-lock"></i>
+        <form action="" method="post">
+            {% csrf_token %}
+            {% if messages %}
+                <div class="alert alert-warning text-center">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            <div class="row">
+                <input type="text" name="username" id="" class="form-control" placeholder="Enter Username">
+            </div>
+            <div class="row">
+                <input type="password" name="password" id="" class="form-control" placeholder="Enter Password">
+            </div>
+            <div class="row">
+                <button class="btn btn-primary">Login</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

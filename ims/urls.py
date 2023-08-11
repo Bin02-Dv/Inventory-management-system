@@ -1,0 +1,37 @@
+from django.urls import path
+from . import views
+
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('user-home', views.user_home, name='user-home'),
+    path('sales-form', views.sales_form, name='sales-form'),
+    path('view-products', views.product, name='view-products'),
+    path('sales', views.sales, name='sales'),
+    path('sales1', views.sales1, name='sales1'),
+    path('sales2', views.sales2, name='sales2'),
+    path('view-sales', views.view_sales, name='view-sales'),
+    path('record-history', views.history, name='record-history'),
+    path('product-search', views.product_search, name='product-search'),
+    path('history-search', views.history_search, name='history-search'),
+    path('sales-search', views.sales_search, name='sales-search'),
+    path('login', views.login, name='login'),
+    path('logout', views.logout, name='logout'),
+    path('add-user', views.user_add, name='add-user'),
+    path('view-user', views.view_user, name='view-user'),
+    path('add-stock', views.add_stock, name='add-stock'),
+    path('view-stock', views.view_stock, name='view-stock'),
+    path('add-category', views.add_category, name='add-category'),
+    path('view-category', views.view_category, name='view-category'),
+    path('profile/<int:id>', views.profile, name='profile'),
+    path('invoice/<int:id>', views.invoice, name='invoice'),
+    path('edit-user/<int:id>', views.edit_user, name='edit-user'),
+    path('update-stock/<int:id>', views.update_stock, name='update-stock'),
+    path('delete/<int:id>', views.delete, name='delete'),
+    path('delete-stock/<int:id>', views.delete_stock, name='delete-stock'),
+    path('delete-category/<int:id>', views.delete_category, name='delete-category'),
+    path('request-for-delete/<int:id>', views.request_for_delete, name='request-for-delete'),
+    path('stock-request-for-delete/<int:id>', views.stock_request_for_delete, name='stock-request-for-delete'),
+    path('category-request-for-delete/<int:id>', views.category_request_for_delete, name='category-request-for-delete'),
+    path('<str:product>', views.get_price, name='get-price'),
+]

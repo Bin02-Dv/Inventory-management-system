@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMS - Sale Stock</title>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/lineawesome/css/line-awesome.min.css">
+    <style>
+        .header-section{
+            position: fixed;
+            display: flex;
+            justify-content: space-between;
+            background-color: #252525;
+            gap: 30px;
+            padding: 20px;
+            width: 100%;
+            z-index: 1000;
+        }
+        a{
+            text-decoration: none;
+            color: yellow;
+            font-size: 20px;
+        }
+        a:hover{
+            color: #fff;
+        }
+        .tabs{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .title{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        .title h2{
+            font-size: 40px;
+            color: yellow;
+        }
+        .img span{
+            color: yellow;
+        }
+        img{
+            border-radius: 50%;
+            border: 3px solid yellow;
+        }
+        .img{
+            text-align: center;
+        }
+        body{
+            background-color: gainsboro;
+        }
+        form{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+            background-color: #252525;
+            border-radius: 10px;
+        }
+        form .row{
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .body-section{
+            padding: 20px;
+        }
+        i{
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="header-section">
+            <div class="img">
+                <img src="{{user.profileimg.url}}" alt="" height="100" width="100" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                <br>
+                <span>@{{user.user.username}}</span>
+            </div>
+            <div class="title">
+                <i class="la la-industry text-warning"></i>
+                <h2>Inventory Management System</h2>
+            </div>
+            <div class="tabs">
+                <a href="/view-sales">Sales</a>
+                <a href="/view-products">Products</a>
+                <a href="/logout" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+    <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Enable body scrolling</button> -->
+
+    <div class="offcanvas offcanvas-start bg-dark" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <button type="button" class="btn-close bg-warning" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="img">
+                <img src="{{user.profileimg.url}}" alt="" height="100" width="100" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                <br>
+                <span>@{{user.user.username}}</span>
+            </div>
+            <style>
+                .tab{
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 20px;
+                    margin-top: 50px;
+                    padding-bottom: 20px;
+                }
+                .tab a{
+                    border: 2px solid yellow;
+                    width: 100%;
+                    padding: 10px;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                }
+            </style>
+            <div class="tab">
+                <a href="/sales"><i class="la la-store text-warning"></i>&nbsp; Sale Stock</a>
+                <a href="/view-sales"><i class="la la-money-bill text-warning"></i>&nbsp; View Sales</a>
+                <a href="/view-products"><i class="la la-shopping-bag text-warning"></i>&nbsp; Products</a>
+                <a href="/logout" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .body-section{
+            margin-top: 200px;
+        }
+        .inputs{
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .details{
+            display: flex;
+        }
+        .details .row{
+            margin-left: 20px;
+        }
+    </style>
+
+    <div class="body-section">
+        <span><a href="/user-home" class="text-dark">Home</a> / Sales Form</span>
+        <div class="from">
+            <form action="" method="post" id="formAdd">
+                {% csrf_token %}
+                <div class="row">
+                    <h3 class="text-warning text-center">Sale Stock</h3>
+                </div>
+                {% if messages %}
+                <div class="alert alert-warning text-center">
+                    {% for message in messages %}
+                        {{ message }} {{q1.product_name}}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="details">
+                    <div class="row">
+                        <input type="text" name="client-name" id="" class="form-control" placeholder="Client Name" required>
+                    </div>
+                    <div class="row">
+                        <input type="tel" name="client-phone" id="" class="form-control" placeholder="Client Phone Number" required>
+                    </div>
+                    <div class="row">
+                        <textarea name="client-address" class="form-control" id="" cols="30" rows="1" placeholder="Client Address" required></textarea>
+                    </div>
+                </div>
+                <div class="inputs">
+                    <div class="row">
+                        <input type="text" name="product1" id="" list="product1" class="form-control" placeholder="Product 1 Name" required>
+                        <datalist name="product1" id="product1">
+                            {% for s in stock %}
+                            <option value="{{s.product_name}}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="row">
+                        <!-- <input type="number" name="p1-price" id="" class="form-control" placeholder="Product 1 Price"> -->
+                        <select name="p1-price" id="" class="form-control">
+                            
+                        </select>
+                    </div>
+                    <div class="row">
+                        <input type="number" name="p1-qtn" id="" class="form-control" value="0" placeholder="Product 1 Quantity" required>
+                    </div>
+                    <div class="row">
+                        <input type="text" name="product2" id="" list="product2" class="form-control" placeholder="Product 2 Name" required>
+                        <datalist name="product2" id="product2">
+                            {% for s in stock %}
+                            <option value="{{s.product_name}}">
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="row">
+                        <!-- <input type="number" name="p2-price" id="" class="form-control" placeholder="Product 2 Price"> -->
+                        <select name="p2-price" id="" class="form-control">
+                            
+                        </select>
+                    </div>
+                    <div class="row">
+                        <input type="number" name="p2-qtn" value="0" id="" class="form-control" placeholder="Product 2 Quantity" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <button class="btn btn-warning">Print Invoice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../static/JQ.js"></script>
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+
+    <script>
+        $("#formAdd  input[name='product1']").on('change', function(){
+            var $this = $(this);
+            if($this.val() !='' || ''){
+                $.ajax({
+                    url: ''+$this.val(),
+                    type: 'GET',
+                    success: function(resp){
+                        let options = '';
+                        resp.data.forEach(products => {
+                            options='<option value='+products.sale_price+'>'+products.sale_price+'</option>'
+                        });
+                        // $('#s_name').val() = options;
+
+                        $("select[name='p1-price']").append(options);
+                        // console.log(options)
+                        // $("select[name='s_name']"). = options;
+                    },
+                    // crossDomain: false,
+                    error: function(resp){
+                        console.log('somthing went wrong');
+                    }
+                });
+                
+                }else{
+                    $("#formAdd  input[name='p1-price']").removeData();
+            }
+        });
+
+        $("#formAdd  input[name='product2']").on('change', function(){
+            var $this = $(this);
+            if($this.val() !='' || ''){
+                $.ajax({
+                    url: ''+$this.val(),
+                    type: 'GET',
+                    success: function(resp){
+                        let options = '';
+                        resp.data.forEach(products => {
+                            options='<option value='+products.sale_price+'>'+products.sale_price+'</option>'
+                        });
+                        // $('#s_name').val() = options;
+
+                        $("select[name='p2-price']").append(options);
+                        // console.log(options)
+                        // $("select[name='s_name']"). = options;
+                    },
+                    // crossDomain: false,
+                    error: function(resp){
+                        console.log('somthing went wrong');
+                    }
+                });
+                
+                }else{
+                    $("#formAdd  input[name='p2-price']").removeData();
+            }
+        });
+    </script>
+</body>
+</html>

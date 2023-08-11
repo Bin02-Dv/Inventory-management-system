@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMS - Add Category</title>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/lineawesome/css/line-awesome.min.css">
+    <style>
+        .header-section{
+            position: fixed;
+            display: flex;
+            justify-content: space-between;
+            background-color: #252525;
+            gap: 30px;
+            padding: 20px;
+            width: 100%;
+            z-index: 1000;
+        }
+        a{
+            text-decoration: none;
+            color: yellow;
+            font-size: 20px;
+        }
+        a:hover{
+            color: #fff;
+        }
+        .tabs{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .title{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+        .title h2{
+            font-size: 40px;
+            color: yellow;
+        }
+        .img span{
+            color: yellow;
+        }
+        img{
+            border-radius: 50%;
+            border: 3px solid yellow;
+        }
+        .img{
+            text-align: center;
+        }
+        body{
+            background-color: gainsboro;
+        }
+        form{
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+            background-color: #252525;
+            border-radius: 10px;
+        }
+        form .row{
+            width: 50%;
+            margin-bottom: 20px;
+        }
+        .body-section{
+            padding: 20px;
+        }
+        i{
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div class="header-section">
+            <div class="img">
+                <img src="{{user.profileimg.url}}" alt="" height="100" width="100" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                <br>
+                <span>@{{user.user.username}}</span>
+            </div>
+            <div class="title">
+                <i class="la la-industry text-warning"></i>
+                <h2>Inventory Management System</h2>
+            </div>
+            <div class="tabs">
+                <a href="/view-stock">Stocks</a>
+                <a href="/view-category">Categories</a>
+                <a href="/view-user">Users</a>
+                <a href="/logout" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+    <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Enable body scrolling</button> -->
+
+    <div class="offcanvas offcanvas-start bg-dark" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <button type="button" class="btn-close bg-warning" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="img">
+                <img src="{{user.profileimg.url}}" alt="" height="100" width="100" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                <br>
+                <span>@{{user.user.username}}</span>
+            </div>
+            <style>
+                .tab{
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 20px;
+                    margin-top: 50px;
+                    padding-bottom: 20px;
+                }
+                .tab a{
+                    border: 2px solid yellow;
+                    width: 100%;
+                    padding: 10px;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                }
+            </style>
+            <div class="tab">
+                <a href="/add-stock"><i class="la la-store text-warning"></i>&nbsp; Add Stock</a>
+                <a href="/view-stock"><i class="la la-store text-warning"></i>&nbsp; View Stock</a>
+                <a href="/add-user"><i class="la la-user-circle text-warning"></i>&nbsp; Add User</a>
+                <a href="/view-user"><i class="la la-user-circle text-warning"></i>&nbsp; View Users</a>
+                <a href="/add-category"><i class="la la-clipboard-list text-warning"></i>&nbsp; Add Category</a>
+                <a href="/view-category"><i class="la la-clipboard-list text-warning"></i>&nbsp; View Categories</a>
+                <a href="/record-history"><i class="la la-history text-warning"></i>&nbsp; Record History</a>
+                <a href="/logout" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+    <style>
+        .body-section{
+            margin-top: 200px;
+        }
+    </style>
+    <div class="body-section">
+        <span><a href="/" class="text-dark">Home</a> / Add category</span>
+        <div class="from">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <h3 class="text-warning text-center">Add Category</h3>
+                </div>
+                {% if messages %}
+                <div class="alert alert-warning">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="row">
+                    <input type="text" name="category" id="" class="form-control" placeholder="Add Category" required>
+                </div>
+                <div class="row">
+                    <button class="btn btn-warning">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
