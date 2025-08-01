@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,8 +87,8 @@
                 <span>@{{c_user.user.username}}</span>
             </div>
             <div class="title">
-                <i class="la la-industry text-warning"></i>
-                <h2>Inventory Management System</h2>
+                <img src="{% static 'img/ak-logo.jpg' %}" height="50" width="50">
+                <h2>AK SHOPPING MALL</h2>
             </div>
             <div class="tabs">
                 <a href="/view-stock">Stocks</a>

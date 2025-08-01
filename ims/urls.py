@@ -8,8 +8,8 @@ urlpatterns = [
     path('sales-form', views.sales_form, name='sales-form'),
     path('view-products', views.product, name='view-products'),
     path('sales', views.sales, name='sales'),
-    path('sales1', views.sales1, name='sales1'),
-    path('sales2', views.sales2, name='sales2'),
+    # path('sales1', views.sales1, name='sales1'),
+    # path('sales2', views.sales2, name='sales2'),
     path('view-sales', views.view_sales, name='view-sales'),
     path('record-history', views.history, name='record-history'),
     path('product-search', views.product_search, name='product-search'),
@@ -34,4 +34,6 @@ urlpatterns = [
     path('stock-request-for-delete/<int:id>', views.stock_request_for_delete, name='stock-request-for-delete'),
     path('category-request-for-delete/<int:id>', views.category_request_for_delete, name='category-request-for-delete'),
     path('<str:product>', views.get_price, name='get-price'),
+    
+    path('get-price/<str:product_name>/', views.get_product_price, name='get-product-price'),
 ]

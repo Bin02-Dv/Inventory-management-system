@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,8 +92,8 @@
                 <span>@{{user.user.username}}</span>
             </div>
             <div class="title">
-                <i class="la la-industry text-warning"></i>
-                <h2>Inventory Management System</h2>
+                <img src="{% static 'img/ak-logo.jpg' %}" height="50" width="50">
+                <h2>AK SHOPPING MALL</h2>
             </div>
             <div class="tabs">
                 <a href="/view-sales">Sales</a>
@@ -144,12 +145,12 @@
     <div class="body-section">
         <div class="cards">
             <div class="card">
-                <a href="/sales1">
-                    <i class="text-warning">1</i>
-                    <h3>Sale Stock in once</h3>
+                <a href="/sales-form">
+                    {% comment %} <i class="text-warning"></i> {% endcomment %}
+                    <h3>Sale Stock</h3>
                 </a>
             </div>
-            <div class="card">
+            {% comment %} <div class="card">
                 <a href="/sales2">
                     <i class="la la-two text-warning">2</i>
                     <h3>Sale Stock Two's</h3>
@@ -160,7 +161,7 @@
                     <i class="text-warning">3</i>
                     <h3>Sale Stock in Three's</h3>
                 </a>
-            </div>
+            </div> {% endcomment %}
         </div>
     </div>
 

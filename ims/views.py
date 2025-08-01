@@ -6,6 +6,7 @@ from .models import *
 from django.contrib.auth.decorators import login_required
 import datetime
 from itertools import chain
+from datetime import timezone
 
 # Create your views here.
 
@@ -59,6 +60,15 @@ def view_sales(request):
     return render(request, 'view-sales.html', context)
 
 @login_required(login_url='login')
+def get_product_price(request, product_name):
+    try:
+        stock_items = Stock.objects.filter(product_name=product_name)
+        data = [{'sale_price': item.sale_price} for item in stock_items]
+        return JsonResponse({'data': data})
+    except Stock.DoesNotExist:
+        return JsonResponse({'data': []})
+
+@login_required(login_url='login')
 def sales_form(request):
     user = Profile.objects.get(user=request.user)
     stock = Stock.objects.all()
@@ -71,220 +81,219 @@ def sales_form(request):
         client_phone = request.POST['client-phone']
         client_address = request.POST['client-address']
 
-        product1 = request.POST['product1']
-        p1_price = request.POST['p1-price']
-        p1_qtn = int(request.POST['p1-qtn'])
+        product_names = request.POST.getlist('product[]')
+        prices = request.POST.getlist('price[]')
+        quantities = request.POST.getlist('quantity[]')
 
-        product2 = request.POST['product2']
-        p2_price = request.POST['p2-price']
-        p2_qtn = int(request.POST['p2-qtn'])
+        total_qtn = 0
+        total_price = 0
+        product_summary = []
+        date = datetime.datetime.now().strftime("%d/%m/%Y")  # e.g. "01/08/2025"
 
-        product3 = request.POST['product3']
-        p3_price = request.POST['p3-price']
-        p3_qtn = int(request.POST['p3-qtn'])
-        date = f"{day}/{month}/{year}"
-
-        qtn1 = Stock.objects.get(product_name=product1)
-        qtn_1 = Stock.objects.filter(product_name=qtn1)
-        qtn2 = Stock.objects.get(product_name=product2)
-        qtn_2 = Stock.objects.filter(product_name=qtn2)
-        qtn3 = Stock.objects.get(product_name=product3)
-        qtn_3 = Stock.objects.filter(product_name=qtn3)
-
-        total_qtn = int(p1_qtn) + int(p2_qtn) + int(p3_qtn)
-        total_price = int(p1_price)+int(p2_price)+int(p3_price)
-
-        for q1 in qtn_1:
-            pass
-        for q2 in qtn_2:
-            pass
-        for q3 in qtn_3:
-            pass
-
-        if client_name is not None:
-
-            if p1_qtn > q1.product_qtn:
-                messages.info(request, 'This product  '+str(q1.product_name)+' is too low the only quantity remaining is '+str(q1.product_qtn))
+        for i in range(len(product_names)):
+            pname = product_names[i]
+            price = int(prices[i])
+            qtn = int(quantities[i])
+            
+            # Check quantity available
+            try:
+                stock_item = Stock.objects.get(product_name=pname)
+            except Stock.DoesNotExist:
+                messages.info(request, f"Product '{pname}' does not exist.")
                 return redirect('sales-form')
-            elif p2_qtn > q2.product_qtn:
-                messages.info(request, 'This product '+str(q2.product_name)+' is too low the only quantity remaining is '+str(q2.product_qtn))
+
+            if qtn > stock_item.product_qtn:
+                messages.info(request, f"The product '{pname}' is too low. Only {stock_item.product_qtn} remaining.")
                 return redirect('sales-form')
-            elif p3_qtn > q2.product_qtn:
-                messages.info(request, 'This product '+str(q3.product_name)+' is too low the only quantity remaining is '+str(q3.product_qtn))
-                return redirect('sales-form')
-            else:
-                for q1 in qtn_1:
-                    new_qtn1 = int(q1.product_qtn) - int(total_qtn)
-                for q2 in qtn_2:
-                    new_qtn2 = int(q2.product_qtn) - int(total_qtn)
-                for q3 in qtn_3:
-                    new_qtn3 = int(q3.product_qtn) - int(total_qtn)
 
-                    sales = Sales.objects.create(
-                        client_name=client_name, client_phone=client_phone, client_address=client_address,
-                        products=f"{product1}, {product2}, {product3}",
-                        total_qtn=total_qtn,user=users,
-                        total_price=total_price, date=date
-                    )
-                    sales.save()
-                    new_history = History.objects.create(
-                        client_name=client_name, client_phone=client_phone, client_address=client_address,
-                        products=f"{product1}, {product2}, {product3}", user=users,
-                        total_qtn=total_qtn, date=date,
-                        total_price=total_price
-                    )
-                    new_history.save()
-                    new_transaction = Transaction.objects.create(date=date, transactions=total_price)
-                    new_transaction.save()
-                    q1.product_qtn = new_qtn1
-                    q1.save()
-                    q2.product_qtn = new_qtn2
-                    q2.save()
-                    q3.product_qtn = new_qtn3
-                    q3.save()
-                    return redirect('view-sales')
-    else:
-        return render(request, 'sales-form.html', {'user':user, 'stock':stock, 'products':products})
+            # Update total
+            total_qtn += qtn
+            total_price += price
+            product_summary.append(pname)
 
-@login_required(login_url='login')
-def sales2(request):
-    user = Profile.objects.get(user=request.user)
-    stock = Stock.objects.all()
-    products = Stock.objects.values('product_name')
-    c_user = User.objects.get(username=request.user)
-    users = c_user.username 
+        # Update stock quantities and save records
+        for i in range(len(product_names)):
+            pname = product_names[i]
+            qtn = int(quantities[i])
+            stock_item = Stock.objects.get(product_name=pname)
+            stock_item.product_qtn -= qtn
+            stock_item.save()
 
-    if request.method == 'POST':
-        client_name = request.POST['client-name']
-        client_phone = request.POST['client-phone']
-        client_address = request.POST['client-address']
+        # Save sales, history, and transaction
+        Sales.objects.create(
+            client_name=client_name,
+            client_phone=client_phone,
+            client_address=client_address,
+            products=", ".join(product_summary),
+            total_qtn=total_qtn,
+            total_price=total_price,
+            user=users,
+            date=date
+        )
 
-        product1 = request.POST['product1']
-        p1_price = request.POST['p1-price']
-        p1_qtn = int(request.POST['p1-qtn'])
+        History.objects.create(
+            client_name=client_name,
+            client_phone=client_phone,
+            client_address=client_address,
+            products=", ".join(product_summary),
+            total_qtn=total_qtn,
+            total_price=total_price,
+            user=users,
+            date=date
+        )
 
-        product2 = request.POST['product2']
-        p2_price = request.POST['p2-price']
-        p2_qtn = int(request.POST['p2-qtn'])
-        date = f"{month}/{day}/{year}"
+        Transaction.objects.create(
+            date=date,
+            transactions=total_price
+        )
 
-        qtn1 = Stock.objects.get(product_name=product1)
-        qtn_1 = Stock.objects.filter(product_name=qtn1)
-        qtn2 = Stock.objects.get(product_name=product2)
-        qtn_2 = Stock.objects.filter(product_name=qtn2)
+        return redirect('view-sales')
 
-        price = int(p1_qtn) * int(p1_price)
-        price2 = int(p2_qtn) * int(p2_price)
+    return render(request, 'sales-form.html', {
+        'user': user,
+        'stock': stock,
+        'products': products
+    })
 
-        total_qtn = int(p1_qtn) + int(p2_qtn)
-        total_price = int(price) + int(price2)
-        for q1 in qtn_1:
-            pass
-        for q2 in qtn_2:
-            pass
-        if client_name is not None:
-            if p1_qtn > q1.product_qtn:
-                messages.info(request, 'This product  '+str(q1.product_name)+' is too low the only quantity remaining is '+str(q1.product_qtn))
-                return redirect('sales2')
-            elif p2_qtn > q2.product_qtn:
-                messages.info(request, 'This product '+str(q2.product_name)+' is too low the only quantity remaining is '+str(q2.product_qtn))
-                return redirect('sales2')
-            else:
-                for q1 in qtn_1:
-                    new_qtn1 = int(q1.product_qtn) - int(total_qtn)
-                for q2 in qtn_2:
-                    new_qtn2 = int(q2.product_qtn) - int(total_qtn)
-                    sales = Sales.objects.create(
-                        client_name=client_name, client_phone=client_phone, client_address=client_address,
-                        products=f"{product1}, {product2}",
-                        total_qtn=total_qtn, user=users,
-                        total_price=total_price, date=date
-                    )
-                    sales.save()
-                    new_history = History.objects.create(
-                        client_name=client_name, client_phone=client_phone, client_address=client_address,
-                        products=f"{product1}, {product2}", user=users,
-                        total_qtn=total_qtn, date=date,
-                        total_price=total_price
-                    )
-                    new_history.save()
-                    new_transaction = Transaction.objects.create(date=date, transactions=total_price)
-                    new_transaction.save()
-                    q1.product_qtn = new_qtn1
-                    q1.save()
-                    q2.product_qtn = new_qtn2
-                    q2.save()
-                    return redirect('view-sales')
+# @login_required(login_url='login')
+# def sales2(request):
+#     user = Profile.objects.get(user=request.user)
+#     stock = Stock.objects.all()
+#     products = Stock.objects.values('product_name')
+#     c_user = User.objects.get(username=request.user)
+#     users = c_user.username 
 
-        else:
-            messages.info(request, 'There is a missing required input!!!')
-            return redirect('sales-form')
-    else:
-        context = {
-            'user':user,
-            'stock':stock,
-            'products':products,
-        }
-        return render(request, 'sales2.html', context)
+#     if request.method == 'POST':
+#         client_name = request.POST['client-name']
+#         client_phone = request.POST['client-phone']
+#         client_address = request.POST['client-address']
 
-@login_required(login_url='login')
-def sales1(request):
-    user = Profile.objects.get(user=request.user)
-    stock = Stock.objects.all()
-    products = Stock.objects.values('product_name')
-    c_user = User.objects.get(username=request.user)
-    users = c_user.username
+#         product1 = request.POST['product1']
+#         p1_price = request.POST['p1-price']
+#         p1_qtn = int(request.POST['p1-qtn'])
 
-    if request.method == 'POST':
-        client_name = request.POST['client-name']
-        client_phone = request.POST['client-phone']
-        client_address = request.POST['client-address']
+#         product2 = request.POST['product2']
+#         p2_price = request.POST['p2-price']
+#         p2_qtn = int(request.POST['p2-qtn'])
+#         date = f"{month}/{day}/{year}"
 
-        product1 = request.POST['product1']
-        p1_price = request.POST['p1-price']
-        p1_qtn = int(request.POST['p1-qtn'])
-        date = f"{day}/{month}/{year}"
+#         qtn1 = Stock.objects.get(product_name=product1)
+#         qtn_1 = Stock.objects.filter(product_name=qtn1)
+#         qtn2 = Stock.objects.get(product_name=product2)
+#         qtn_2 = Stock.objects.filter(product_name=qtn2)
 
-        qtn1 = Stock.objects.get(product_name=product1)
-        qtns = Stock.objects.filter(product_name=qtn1)
+#         price = int(p1_qtn) * int(p1_price)
+#         price2 = int(p2_qtn) * int(p2_price)
 
-        price = int(p1_qtn) * int(p1_price)
+#         total_qtn = int(p1_qtn) + int(p2_qtn)
+#         total_price = int(price) + int(price2)
+#         for q1 in qtn_1:
+#             pass
+#         for q2 in qtn_2:
+#             pass
+#         if client_name is not None:
+#             if p1_qtn > q1.product_qtn:
+#                 messages.info(request, 'This product  '+str(q1.product_name)+' is too low the only quantity remaining is '+str(q1.product_qtn))
+#                 return redirect('sales2')
+#             elif p2_qtn > q2.product_qtn:
+#                 messages.info(request, 'This product '+str(q2.product_name)+' is too low the only quantity remaining is '+str(q2.product_qtn))
+#                 return redirect('sales2')
+#             else:
+#                 for q1 in qtn_1:
+#                     new_qtn1 = int(q1.product_qtn) - int(total_qtn)
+#                 for q2 in qtn_2:
+#                     new_qtn2 = int(q2.product_qtn) - int(total_qtn)
+#                     sales = Sales.objects.create(
+#                         client_name=client_name, client_phone=client_phone, client_address=client_address,
+#                         products=f"{product1}, {product2}",
+#                         total_qtn=total_qtn, user=users,
+#                         total_price=total_price, date=date
+#                     )
+#                     sales.save()
+#                     new_history = History.objects.create(
+#                         client_name=client_name, client_phone=client_phone, client_address=client_address,
+#                         products=f"{product1}, {product2}", user=users,
+#                         total_qtn=total_qtn, date=date,
+#                         total_price=total_price
+#                     )
+#                     new_history.save()
+#                     new_transaction = Transaction.objects.create(date=date, transactions=total_price)
+#                     new_transaction.save()
+#                     q1.product_qtn = new_qtn1
+#                     q1.save()
+#                     q2.product_qtn = new_qtn2
+#                     q2.save()
+#                     return redirect('view-sales')
 
-        total_qtn = int(p1_qtn)
-        total_price = price
+#         else:
+#             messages.info(request, 'There is a missing required input!!!')
+#             return redirect('sales-form')
+#     else:
+#         context = {
+#             'user':user,
+#             'stock':stock,
+#             'products':products,
+#         }
+#         return render(request, 'sales2.html', context)
 
-        if client_name is not None:
-            for q in qtns:
-                if p1_qtn > q.product_qtn:
-                    messages.info(request, 'This product is low..')
-                    return redirect('sales1')
-                else:
-                    new_qtn1 = int(q.product_qtn) - int(total_qtn)
-                    sales = Sales.objects.create(
-                        client_name=client_name, client_phone=client_phone, client_address=client_address,
-                        products=product1, user=users,
-                        total_qtn=int(p1_qtn), date=date,
-                        total_price=total_price
-                    )
-                    sales.save()
-                    new_history = History.objects.create(
-                        client_name=client_name, client_phone=client_phone, client_address=client_address,
-                        products=product1, user=users,
-                        total_qtn=int(p1_qtn), date=date,
-                        total_price=total_price
-                    )
-                    new_history.save()
-                    new_transaction = Transaction.objects.create(date=date, transactions=total_price)
-                    new_transaction.save()
-                    q.product_qtn = new_qtn1
-                    q.save()
-                    return redirect('view-sales')
+# @login_required(login_url='login')
+# def sales1(request):
+#     user = Profile.objects.get(user=request.user)
+#     stock = Stock.objects.all()
+#     products = Stock.objects.values('product_name')
+#     c_user = User.objects.get(username=request.user)
+#     users = c_user.username
 
-        else:
-            messages.info(request, 'There is a missing required input!!!')
-            return redirect('sales-form')
-    else:
-        return render(request, 'sales1.html', {'user':user, 'stock':stock, 'products':products})
+#     if request.method == 'POST':
+#         client_name = request.POST['client-name']
+#         client_phone = request.POST['client-phone']
+#         client_address = request.POST['client-address']
+
+#         product1 = request.POST['product1']
+#         p1_price = request.POST['p1-price']
+#         p1_qtn = int(request.POST['p1-qtn'])
+#         date = f"{day}/{month}/{year}"
+
+#         qtn1 = Stock.objects.get(product_name=product1)
+#         qtns = Stock.objects.filter(product_name=qtn1)
+
+#         price = int(p1_qtn) * int(p1_price)
+
+#         total_qtn = int(p1_qtn)
+#         total_price = price
+
+#         if client_name is not None:
+#             for q in qtns:
+#                 if p1_qtn > q.product_qtn:
+#                     messages.info(request, 'This product is low..')
+#                     return redirect('sales1')
+#                 else:
+#                     new_qtn1 = int(q.product_qtn) - int(total_qtn)
+#                     sales = Sales.objects.create(
+#                         client_name=client_name, client_phone=client_phone, client_address=client_address,
+#                         products=product1, user=users,
+#                         total_qtn=int(p1_qtn), date=date,
+#                         total_price=total_price
+#                     )
+#                     sales.save()
+#                     new_history = History.objects.create(
+#                         client_name=client_name, client_phone=client_phone, client_address=client_address,
+#                         products=product1, user=users,
+#                         total_qtn=int(p1_qtn), date=date,
+#                         total_price=total_price
+#                     )
+#                     new_history.save()
+#                     new_transaction = Transaction.objects.create(date=date, transactions=total_price)
+#                     new_transaction.save()
+#                     q.product_qtn = new_qtn1
+#                     q.save()
+#                     return redirect('view-sales')
+
+#         else:
+#             messages.info(request, 'There is a missing required input!!!')
+#             return redirect('sales-form')
+#     else:
+#         return render(request, 'sales1.html', {'user':user, 'stock':stock, 'products':products})
 
 def get_price(request, product, *args, **kwargs):
     if request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,8 +87,8 @@
                 <span>@{{user.user.username}}</span>
             </div>
             <div class="title">
-                <i class="la la-industry text-warning"></i>
-                <h2>Inventory Management System</h2>
+                <img src="{% static 'img/ak-logo.jpg' %}" height="50" width="50">
+                <h2>AK SHOPPING MALL</h2>
             </div>
             <div class="tabs">
                 <a href="/view-sales">Sales</a>
@@ -162,6 +163,7 @@
                 <div class="row">
                     <h3 class="text-warning text-center">Sale Stock</h3>
                 </div>
+
                 {% if messages %}
                 <div class="alert alert-warning text-center">
                     {% for message in messages %}
@@ -169,163 +171,107 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+
                 <div class="details">
                     <div class="row">
-                        <input type="text" name="client-name" id="" class="form-control" placeholder="Client Name" required>
+                        <input type="text" name="client-name" class="form-control" placeholder="Client Name" required>
                     </div>
                     <div class="row">
-                        <input type="tel" name="client-phone" id="" class="form-control" placeholder="Client Phone Number" required>
+                        <input type="tel" name="client-phone" class="form-control" placeholder="Client Phone Number" required>
                     </div>
                     <div class="row">
-                        <textarea name="client-address" class="form-control" id="" cols="30" rows="1" placeholder="Client Address" required></textarea>
+                        <textarea name="client-address" class="form-control" rows="1" placeholder="Client Address" required></textarea>
                     </div>
                 </div>
-                <div class="inputs">
-                    <div class="row">
-                        <input type="text" name="product1" id="" list="product1" class="form-control" placeholder="Product 1 Name" required>
-                        <datalist name="product1" id="product1">
-                            {% for s in stock %}
-                            <option value="{{s.product_name}}">
-                            {% endfor %}
-                        </datalist>
-                    </div>
-                    <div class="row">
-                        <!-- <input type="number" name="p1-price" id="" class="form-control" placeholder="Product 1 Price"> -->
-                        <select name="p1-price" id="" class="form-control">
-                
-                        </select>
-                    </div>
-                    <div class="row">
-                        <input type="number" name="p1-qtn" id="" class="form-control" value="0" placeholder="Product 1 Quantity" required>
-                    </div>
-                    <div class="row">
-                        <input type="text" name="product2" id="" list="product2" class="form-control" placeholder="Product 2 Name" required>
-                        <datalist name="product2" id="product2">
-                            {% for s in stock %}
-                            <option value="{{s.product_name}}">
-                            {% endfor %}
-                        </datalist>
-                    </div>
-                    <div class="row">
-                        <!-- <input type="number" name="p2-price" id="" class="form-control" placeholder="Product 2 Price"> -->
-                        <select name="p2-price" id="" class="form-control">
-                            
-                        </select>
-                    </div>
-                    <div class="row">
-                        <input type="number" name="p2-qtn" value="0" id="" class="form-control" placeholder="Product 2 Quantity" required>
-                    </div>
-                    <div class="row">
-                        <input type="text" name="product3" id="" list="product3" class="form-control" placeholder="Product 3 Name" required>
-                        <datalist name="product3" id="product3">
-                            {% for s in stock %}
-                            <option value="{{s.product_name}}">
-                            {% endfor %}
-                        </datalist>
-                    </div>
-                    <div class="row">
-                        <!-- <input type="number" name="p3-price" id="" class="form-control" placeholder="Product 3 Price"> -->
-                        <select name="p3-price" id="" class="form-control">
-                            
-                        </select>
-                    </div>
-                    <div class="row">
-                        <input type="number" name="p3-qtn" value="0" id="" class="form-control" placeholder="Product 3 Quantity" required>
+
+                <!-- Product Inputs Container -->
+                <div id="product-container">
+                    <div class="inputs product-group">
+                        <div class="row">
+                            <input type="text" name="product[]" list="product-list" class="form-control" placeholder="Product Name" required>
+                            <datalist id="product-list">
+                                {% for s in stock %}
+                                    <option value="{{s.product_name}}">
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <div class="row">
+                            <select name="price[]" class="form-control">
+                                <!-- Populate dynamically with JS or backend -->
+                            </select>
+                        </div>
+                        <div class="row">
+                            <input type="number" name="quantity[]" class="form-control" value="0" placeholder="Product Quantity" required>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Button to Add More Products -->
                 <div class="row">
-                    <button class="btn btn-warning">Print Invoice</button>
+                    <button type="button" class="btn btn-success" onclick="addProductRow()">+ Add Another Product</button>
+                </div>
+
+                <div class="row mt-2">
+                    <button type="submit" class="btn btn-warning">Print Invoice</button>
                 </div>
             </form>
         </div>
     </div>
+
     <script src="../static/JQ.js"></script>
     <script src="../static/bootstrap/js/bootstrap.min.js"></script>
 
     <script>
-        $("#formAdd  input[name='product1']").on('change', function(){
+        // Use event delegation to handle dynamic rows
+        $(document).on('change', "input[name='product[]']", function() {
             var $this = $(this);
-            if($this.val() !='' || ''){
-                $.ajax({
-                    url: ''+$this.val(),
-                    type: 'GET',
-                    success: function(resp){
-                        let options = '';
-                        resp.data.forEach(products => {
-                            options='<option value='+products.sale_price+'>'+products.sale_price+'</option>'
-                        });
-                        // $('#s_name').val() = options;
+            var productName = $this.val();
 
-                        $("select[name='p1-price']").append(options);
-                        // console.log(options)
-                        // $("select[name='s_name']"). = options;
+            if (productName !== '') {
+                $.ajax({
+                    url: '/get-price/' + productName, // Adjust this to the actual URL that fetches the price
+                    type: 'GET',
+                    success: function(resp) {
+                        let options = '';
+                        resp.data.forEach(product => {
+                            options += '<option value="' + product.sale_price + '">' + product.sale_price + '</option>';
+                        });
+
+                        // Find the select box in the same group and update it
+                        $this.closest('.product-group').find("select[name='price[]']").html(options);
                     },
-                    // crossDomain: false,
-                    error: function(resp){
-                        console.log('somthing went wrong');
+                    error: function(resp) {
+                        console.log('Something went wrong');
                     }
                 });
-                
-                }else{
-                    $("#formAdd  input[name='p1-price']").removeData();
-            }
-        });
-
-        $("#formAdd  input[name='product2']").on('change', function(){
-            var $this = $(this);
-            if($this.val() !='' || ''){
-                $.ajax({
-                    url: ''+$this.val(),
-                    type: 'GET',
-                    success: function(resp){
-                        let options = '';
-                        resp.data.forEach(products => {
-                            options='<option value='+products.sale_price+'>'+products.sale_price+'</option>'
-                        });
-                        // $('#s_name').val() = options;
-
-                        $("select[name='p2-price']").append(options);
-                        // console.log(options)
-                        // $("select[name='s_name']"). = options;
-                    },
-                    // crossDomain: false,
-                    error: function(resp){
-                        console.log('somthing went wrong');
-                    }
-                });
-                
-                }else{
-                    $("#formAdd  input[name='p2-price']").removeData();
-            }
-        });
-
-        $("#formAdd  input[name='product3']").on('change', function(){
-            var $this = $(this);
-            if($this.val() !='' || ''){
-                $.ajax({
-                    url: ''+$this.val(),
-                    type: 'GET',
-                    success: function(resp){
-                        let options = '';
-                        resp.data.forEach(products => {
-                            options='<option value='+products.sale_price+'>'+products.sale_price+'</option>'
-                        });
-                        // $('#s_name').val() = options;
-
-                        $("select[name='p3-price']").append(options);
-                        // console.log(options)
-                        // $("select[name='s_name']"). = options;
-                    },
-                    // crossDomain: false,
-                    error: function(resp){
-                        console.log('somthing went wrong');
-                    }
-                });
-                
-                }else{
-                    $("#formAdd  input[name='p3-price']").removeData();
+            } else {
+                $this.closest('.product-group').find("select[name='price[]']").html('');
             }
         });
     </script>
+
+
+    <script>
+        function addProductRow() {
+            const container = document.getElementById('product-container');
+
+            const newRow = document.createElement('div');
+            newRow.className = 'inputs product-group';
+            newRow.innerHTML = `
+                <div class="row">
+                    <input type="text" name="product[]" list="product-list" class="form-control" placeholder="Product Name" required>
+                </div>
+                <div class="row">
+                    <select name="price[]" class="form-control"></select>
+                </div>
+                <div class="row">
+                    <input type="number" name="quantity[]" class="form-control" value="0" placeholder="Product Quantity" required>
+                </div>
+            `;
+
+            container.appendChild(newRow);
+        }
+</script>
+
 </body>
 </html>
