@@ -167,7 +167,7 @@
                 <th scope="col">Category</th>
                 <th scope="col">Product</th>
                 <th scope="col">Quantity</th>
-                <th scope="col">Price</th>
+                {% comment %} <th scope="col">Price</th> {% endcomment %}
                 <th scope="col">Sale Price</th>
                 <th scope="col" class="text-center">Date Created / Updated</th>
                 <th scope="col" class="text-center">Actions</th>
@@ -185,7 +185,7 @@
                 <td>{{s.category}}</td>
                 <td>{{s.product_name}}</td>
                 <td>{{s.product_qtn}}</td>
-                <td><i class="fa-solid fa-naira-sign"></i> {{s.price}}</td>
+                {% comment %} <td><i class="fa-solid fa-naira-sign"></i> {{s.price}}</td> {% endcomment %}
                 <td><i class="fa-solid fa-naira-sign"></i> {{s.sale_price}}</td>
                 <td class="text-center">{{s.date}}</td>
                 <td class="text-center">

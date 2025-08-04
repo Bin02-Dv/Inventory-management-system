@@ -108,7 +108,7 @@ def sales_form(request):
 
             # Update total
             total_qtn += qtn
-            total_price += price
+            total_price += price * qtn
             product_summary.append(pname)
 
         # Update stock quantities and save records
@@ -492,7 +492,7 @@ def add_stock(request):
         product_name = request.POST['product-name']
         product_qtn = request.POST['product-qtn']
         price = request.POST['price']
-        sale_price = int(price) + 200
+        sale_price = price
         date = f"{day}/{month}/{year}"
 
         if Stock.objects.filter(product_name=product_name).exists():
@@ -528,7 +528,7 @@ def update_stock(request, id):
         product_name = request.POST['product-name']
         product_qtn = request.POST['product-qtn']
         price = request.POST['price']
-        sale_price = int(price) + 200
+        sale_price = price
 
         stock.category = category
         stock.product_name = product_name
