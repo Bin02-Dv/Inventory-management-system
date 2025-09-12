@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 import datetime
 from itertools import chain
 from datetime import timezone
+from django.db.models import Q
 
 # Create your views here.
 
@@ -582,7 +583,9 @@ def history_search(request):
     history_record_list = ''
     if request.method == 'POST':
         name = request.POST['name']
-        product = History.objects.filter(date__icontains=name)
+        product = History.objects.filter(
+            Q(date__icontains=name) | Q(user__icontains=name)
+        )
         sum_a = sum([tran.total_price for tran in product])
 
         history_list = []
