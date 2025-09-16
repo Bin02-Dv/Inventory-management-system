@@ -170,6 +170,8 @@
                 {% comment %} <th scope="col">Price</th> {% endcomment %}
                 <th scope="col">Sale Price</th>
                 <th scope="col" class="text-center">Date Created / Updated</th>
+                <th scope="col" class="text-center">Expiry Date</th>
+                <th scope="col" class="text-center">Manufacturer Date</th>
                 <th scope="col" class="text-center">Actions</th>
               </tr>
             </thead>
@@ -188,6 +190,8 @@
                 {% comment %} <td><i class="fa-solid fa-naira-sign"></i> {{s.price}}</td> {% endcomment %}
                 <td><i class="fa-solid fa-naira-sign"></i> {{s.sale_price}}</td>
                 <td class="text-center">{{s.date}}</td>
+                <td class="text-center">{{s.expiry_date}}</td>
+                <td class="text-center">{{s.manufacturer_date}}</td>
                 <td class="text-center">
                     <a href="/update-stock/{{s.id}}" class="btn btn-primary"><i class="la la-edit"></i></a>
                     <a href="/stock-request-for-delete/{{s.id}}" class="btn btn-danger"><i class="la la-trash"></i></a>

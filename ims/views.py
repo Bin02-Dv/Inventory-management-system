@@ -493,6 +493,8 @@ def add_stock(request):
         product_name = request.POST['product-name']
         product_qtn = request.POST['product-qtn']
         price = request.POST['price']
+        expiry_date = request.POST['expiry_date']
+        manufacturer_date = request.POST['manufacturer_date']
         sale_price = price
         date = f"{day}/{month}/{year}"
 
@@ -502,7 +504,7 @@ def add_stock(request):
         else:
             new_stock = Stock.objects.create(
                 category=category, product_name=product_name, product_qtn=product_qtn,
-                price=price, sale_price=sale_price, date=date
+                price=price, sale_price=sale_price, date=date, expiry_date=expiry_date, manufacturer_date=manufacturer_date
             )
             new_stock.save()
             return redirect('view-stock')
