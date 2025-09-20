@@ -24,8 +24,8 @@ class Stock(models.Model):
     product_qtn = models.IntegerField(blank=True)
     price = models.IntegerField(blank=True)
     sale_price = models.IntegerField(blank=True)
-    expiry_date = models.CharField(blank=True)
-    manufacturer_date = models.CharField(blank=True)
+    expiry_date = models.CharField(max_length=100, blank=True)
+    manufacturer_date = models.CharField(max_length=100, blank=True)
     date = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
